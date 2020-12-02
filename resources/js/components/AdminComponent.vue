@@ -68,7 +68,7 @@ export default {
     }),
     mounted(){
         this.snackbar = !!localStorage.getItem('loggedIn');
-        localStorage.removeItem('loggedIn');
+        localStorage.removeItem('loggedIn ok');
     },
     methods: {
         logout: function (){

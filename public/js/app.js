@@ -2122,7 +2122,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "LoginComponent",
   data: function data() {
@@ -2136,7 +2135,7 @@ __webpack_require__.r(__webpack_exports__);
       }],
       password: '',
       passwordRules: [function (v) {
-        return !!v || 'E-mail is required';
+        return !!v || 'Password is required';
       }],
       loading: false,
       snackbar: false,
@@ -2343,51 +2342,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -2413,19 +2367,19 @@ __webpack_require__.r(__webpack_exports__);
         value: 'actions',
         sortable: false
       }],
-      desserts: [],
+      roles: [],
       editedIndex: -1,
       editedItem: {
         id: '',
-        name: 0,
-        created_at: 0,
-        updated_at: 0
+        name: '',
+        created_at: '',
+        updated_at: ''
       },
       defaultItem: {
         id: '',
-        name: 0,
-        created_at: 0,
-        updated_at: 0
+        name: '',
+        created_at: '',
+        updated_at: ''
       }
     };
   },
@@ -2447,105 +2401,78 @@ __webpack_require__.r(__webpack_exports__);
   },
   methods: {
     initialize: function initialize() {
-      this.desserts = [{
-        name: 'Frozen Yogurt',
-        calories: 159,
-        fat: 6.0,
-        carbs: 24,
-        protein: 4.0
-      }, {
-        name: 'Ice cream sandwich',
-        calories: 237,
-        fat: 9.0,
-        carbs: 37,
-        protein: 4.3
-      }, {
-        name: 'Eclair',
-        calories: 262,
-        fat: 16.0,
-        carbs: 23,
-        protein: 6.0
-      }, {
-        name: 'Cupcake',
-        calories: 305,
-        fat: 3.7,
-        carbs: 67,
-        protein: 4.3
-      }, {
-        name: 'Gingerbread',
-        calories: 356,
-        fat: 16.0,
-        carbs: 49,
-        protein: 3.9
-      }, {
-        name: 'Jelly bean',
-        calories: 375,
-        fat: 0.0,
-        carbs: 94,
-        protein: 0.0
-      }, {
-        name: 'Lollipop',
-        calories: 392,
-        fat: 0.2,
-        carbs: 98,
-        protein: 0
-      }, {
-        name: 'Honeycomb',
-        calories: 408,
-        fat: 3.2,
-        carbs: 87,
-        protein: 6.5
-      }, {
-        name: 'Donut',
-        calories: 452,
-        fat: 25.0,
-        carbs: 51,
-        protein: 4.9
-      }, {
-        name: 'KitKat',
-        calories: 518,
-        fat: 26.0,
-        carbs: 65,
-        protein: 7
-      }];
+      var _this = this;
+
+      // Add a request interceptor
+      axios.interceptors.request.use(function (config) {
+        _this.loading = true;
+        return config;
+      }, function (error) {
+        _this.loading = false;
+        return Promise.reject(error);
+      }); // Add a response interceptor
+
+      axios.interceptors.response.use(function (response) {
+        _this.loading = false;
+        return response;
+      }, function (error) {
+        _this.loading = false;
+        return Promise.reject(error);
+      });
+      axios.get('/api/roles', {}).then(function (res) {
+        return _this.roles = res.data.roles;
+      });
     },
     editItem: function editItem(item) {
-      this.editedIndex = this.desserts.indexOf(item);
+      this.editedIndex = this.roles.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
     },
     deleteItem: function deleteItem(item) {
-      this.editedIndex = this.desserts.indexOf(item);
+      this.editedIndex = this.roles.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialogDelete = true;
     },
     deleteItemConfirm: function deleteItemConfirm() {
-      this.desserts.splice(this.editedIndex, 1);
+      this.roles.splice(this.editedIndex, 1);
       this.closeDelete();
     },
     close: function close() {
-      var _this = this;
+      var _this2 = this;
 
       this.dialog = false;
       this.$nextTick(function () {
-        _this.editedItem = Object.assign({}, _this.defaultItem);
-        _this.editedIndex = -1;
+        _this2.editedItem = Object.assign({}, _this2.defaultItem); // this.editedIndex = -1
       });
     },
     closeDelete: function closeDelete() {
-      var _this2 = this;
+      var _this3 = this;
 
       this.dialogDelete = false;
       this.$nextTick(function () {
-        _this2.editedItem = Object.assign({}, _this2.defaultItem);
-        _this2.editedIndex = -1;
+        _this3.editedItem = Object.assign({}, _this3.defaultItem);
+        _this3.editedIndex = -1;
       });
     },
     save: function save() {
+      var _this4 = this;
+
       if (this.editedIndex > -1) {
-        Object.assign(this.desserts[this.editedIndex], this.editedItem);
+        axios.put('/api/roles/' + this.editedItem.id, {
+          'name': this.editedItem.name
+        }).then(function (res) {
+          return Object.assign(_this4.roles[_this4.editedIndex], res.data.role);
+        })["catch"](function (err) {
+          return console.dir(err.response);
+        });
       } else {
-        this.desserts.push(this.editedItem);
+        axios.post('/api/roles', {
+          'name': this.editedItem.name
+        }).then(function (res) {
+          return _this4.roles.push(res.data.role);
+        })["catch"](function (err) {
+          return console.dir(err.response);
+        });
       }
 
       this.close();
@@ -20710,7 +20637,7 @@ var render = function() {
       loading: _vm.loading,
       "loading-text": "Loading... Please wait",
       headers: _vm.headers,
-      items: _vm.desserts,
+      items: _vm.roles,
       "sort-by": "calories"
     },
     scopedSlots: _vm._u([
@@ -20758,7 +20685,7 @@ var render = function() {
                               ),
                               [
                                 _vm._v(
-                                  "\n                        New Item\n                    "
+                                  "\n                        New Role\n                    "
                                 )
                               ]
                             )
@@ -20796,12 +20723,10 @@ var render = function() {
                                   [
                                     _c(
                                       "v-col",
-                                      {
-                                        attrs: { cols: "12", sm: "6", md: "4" }
-                                      },
+                                      { attrs: { cols: "12", sm: "12" } },
                                       [
                                         _c("v-text-field", {
-                                          attrs: { label: "Dessert name" },
+                                          attrs: { label: "Role name" },
                                           model: {
                                             value: _vm.editedItem.name,
                                             callback: function($$v) {
@@ -20812,102 +20737,6 @@ var render = function() {
                                               )
                                             },
                                             expression: "editedItem.name"
-                                          }
-                                        })
-                                      ],
-                                      1
-                                    ),
-                                    _vm._v(" "),
-                                    _c(
-                                      "v-col",
-                                      {
-                                        attrs: { cols: "12", sm: "6", md: "4" }
-                                      },
-                                      [
-                                        _c("v-text-field", {
-                                          attrs: { label: "Calories" },
-                                          model: {
-                                            value: _vm.editedItem.calories,
-                                            callback: function($$v) {
-                                              _vm.$set(
-                                                _vm.editedItem,
-                                                "calories",
-                                                $$v
-                                              )
-                                            },
-                                            expression: "editedItem.calories"
-                                          }
-                                        })
-                                      ],
-                                      1
-                                    ),
-                                    _vm._v(" "),
-                                    _c(
-                                      "v-col",
-                                      {
-                                        attrs: { cols: "12", sm: "6", md: "4" }
-                                      },
-                                      [
-                                        _c("v-text-field", {
-                                          attrs: { label: "Fat (g)" },
-                                          model: {
-                                            value: _vm.editedItem.fat,
-                                            callback: function($$v) {
-                                              _vm.$set(
-                                                _vm.editedItem,
-                                                "fat",
-                                                $$v
-                                              )
-                                            },
-                                            expression: "editedItem.fat"
-                                          }
-                                        })
-                                      ],
-                                      1
-                                    ),
-                                    _vm._v(" "),
-                                    _c(
-                                      "v-col",
-                                      {
-                                        attrs: { cols: "12", sm: "6", md: "4" }
-                                      },
-                                      [
-                                        _c("v-text-field", {
-                                          attrs: { label: "Carbs (g)" },
-                                          model: {
-                                            value: _vm.editedItem.carbs,
-                                            callback: function($$v) {
-                                              _vm.$set(
-                                                _vm.editedItem,
-                                                "carbs",
-                                                $$v
-                                              )
-                                            },
-                                            expression: "editedItem.carbs"
-                                          }
-                                        })
-                                      ],
-                                      1
-                                    ),
-                                    _vm._v(" "),
-                                    _c(
-                                      "v-col",
-                                      {
-                                        attrs: { cols: "12", sm: "6", md: "4" }
-                                      },
-                                      [
-                                        _c("v-text-field", {
-                                          attrs: { label: "Protein (g)" },
-                                          model: {
-                                            value: _vm.editedItem.protein,
-                                            callback: function($$v) {
-                                              _vm.$set(
-                                                _vm.editedItem,
-                                                "protein",
-                                                $$v
-                                              )
-                                            },
-                                            expression: "editedItem.protein"
                                           }
                                         })
                                       ],
@@ -80855,8 +80684,8 @@ vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(vuetify__WEBPACK_IMPORTED_MODULE_
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! /home/irshad/Desktop/Training/VuLaraTraining/resources/js/app.js */"./resources/js/app.js");
-module.exports = __webpack_require__(/*! /home/irshad/Desktop/Training/VuLaraTraining/resources/sass/app.scss */"./resources/sass/app.scss");
+__webpack_require__(/*! /home/irshad/Desktop/Training/Laravel_Vu_Training_November_2020/resources/js/app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! /home/irshad/Desktop/Training/Laravel_Vu_Training_November_2020/resources/sass/app.scss */"./resources/sass/app.scss");
 
 
 /***/ })

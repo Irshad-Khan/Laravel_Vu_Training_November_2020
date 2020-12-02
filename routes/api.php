@@ -19,3 +19,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::post('login', [\App\Http\Controllers\Api\UserController::class, 'login'])->name('login');
+Route::resource('roles', '\App\Http\Controllers\Api\RoleController');
+Route::group(['middleware' => ['auth:api']], function (){
+
+});

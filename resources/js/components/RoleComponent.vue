@@ -5,7 +5,7 @@
         :loading="loading"
         loading-text="Loading... Please wait"
         :headers="headers"
-        :items="desserts"
+        :items="roles"
         sort-by="calories"
     >
         <template v-slot:top>
@@ -31,7 +31,7 @@
                             v-bind="attrs"
                             v-on="on"
                         >
-                            New Item
+                            New Role
                         </v-btn>
                     </template>
                     <v-card>
@@ -42,54 +42,9 @@
                         <v-card-text>
                             <v-container>
                                 <v-row>
-                                    <v-col
-                                        cols="12"
-                                        sm="6"
-                                        md="4"
-                                    >
-                                        <v-text-field
-                                            v-model="editedItem.name"
-                                            label="Dessert name"
-                                        ></v-text-field>
-                                    </v-col>
-                                    <v-col
-                                        cols="12"
-                                        sm="6"
-                                        md="4"
-                                    >
-                                        <v-text-field
-                                            v-model="editedItem.calories"
-                                            label="Calories"
-                                        ></v-text-field>
-                                    </v-col>
-                                    <v-col
-                                        cols="12"
-                                        sm="6"
-                                        md="4"
-                                    >
-                                        <v-text-field
-                                            v-model="editedItem.fat"
-                                            label="Fat (g)"
-                                        ></v-text-field>
-                                    </v-col>
-                                    <v-col
-                                        cols="12"
-                                        sm="6"
-                                        md="4"
-                                    >
-                                        <v-text-field
-                                            v-model="editedItem.carbs"
-                                            label="Carbs (g)"
-                                        ></v-text-field>
-                                    </v-col>
-                                    <v-col
-                                        cols="12"
-                                        sm="6"
-                                        md="4"
-                                    >
-                                        <v-text-field
-                                            v-model="editedItem.protein"
-                                            label="Protein (g)"
+                                    <v-col cols="12" sm="12">
+                                        <v-text-field v-model="editedItem.name"
+                                            label="Role name"
                                         ></v-text-field>
                                     </v-col>
                                 </v-row>
@@ -172,19 +127,19 @@ export default {
             { text: 'Updated At', value: 'updated_at' },
             { text: 'Actions', value: 'actions', sortable: false },
         ],
-        desserts: [],
+        roles: [],
         editedIndex: -1,
         editedItem: {
             id: '',
-            name: 0,
-            created_at: 0,
-            updated_at: 0,
+            name: '',
+            created_at: '',
+            updated_at: ''
         },
         defaultItem: {
-            id: '',
-            name: 0,
-            created_at: 0,
-            updated_at: 0,
+          id: '',
+          name: '',
+          created_at: '',
+          updated_at: ''
         },
     }),
 
@@ -209,94 +164,42 @@ export default {
 
     methods: {
         initialize () {
-            this.desserts = [
-                {
-                    name: 'Frozen Yogurt',
-                    calories: 159,
-                    fat: 6.0,
-                    carbs: 24,
-                    protein: 4.0,
-                },
-                {
-                    name: 'Ice cream sandwich',
-                    calories: 237,
-                    fat: 9.0,
-                    carbs: 37,
-                    protein: 4.3,
-                },
-                {
-                    name: 'Eclair',
-                    calories: 262,
-                    fat: 16.0,
-                    carbs: 23,
-                    protein: 6.0,
-                },
-                {
-                    name: 'Cupcake',
-                    calories: 305,
-                    fat: 3.7,
-                    carbs: 67,
-                    protein: 4.3,
-                },
-                {
-                    name: 'Gingerbread',
-                    calories: 356,
-                    fat: 16.0,
-                    carbs: 49,
-                    protein: 3.9,
-                },
-                {
-                    name: 'Jelly bean',
-                    calories: 375,
-                    fat: 0.0,
-                    carbs: 94,
-                    protein: 0.0,
-                },
-                {
-                    name: 'Lollipop',
-                    calories: 392,
-                    fat: 0.2,
-                    carbs: 98,
-                    protein: 0,
-                },
-                {
-                    name: 'Honeycomb',
-                    calories: 408,
-                    fat: 3.2,
-                    carbs: 87,
-                    protein: 6.5,
-                },
-                {
-                    name: 'Donut',
-                    calories: 452,
-                    fat: 25.0,
-                    carbs: 51,
-                    protein: 4.9,
-                },
-                {
-                    name: 'KitKat',
-                    calories: 518,
-                    fat: 26.0,
-                    carbs: 65,
-                    protein: 7,
-                },
-            ]
+
+          // Add a request interceptor
+          axios.interceptors.request.use((config) => {
+            this.loading = true;
+            return config;
+          }, (error) => {
+            this.loading = false;
+            return Promise.reject(error);
+          });
+
+          // Add a response interceptor
+          axios.interceptors.response.use( (response) => {
+            this.loading = false;
+            return response;
+          }, (error) => {
+            this.loading = false;
+            return Promise.reject(error);
+          });
+          axios.get('/api/roles', {})
+              .then( res => this.roles = res.data.roles)
         },
 
         editItem (item) {
-            this.editedIndex = this.desserts.indexOf(item)
+            this.editedIndex = this.roles.indexOf(item)
             this.editedItem = Object.assign({}, item)
             this.dialog = true
         },
 
         deleteItem (item) {
-            this.editedIndex = this.desserts.indexOf(item)
+            this.editedIndex = this.roles.indexOf(item)
             this.editedItem = Object.assign({}, item)
             this.dialogDelete = true
         },
 
         deleteItemConfirm () {
-            this.desserts.splice(this.editedIndex, 1)
+            this.roles.splice(this.editedIndex, 1)
             this.closeDelete()
         },
 
@@ -304,7 +207,7 @@ export default {
             this.dialog = false
             this.$nextTick(() => {
                 this.editedItem = Object.assign({}, this.defaultItem)
-                this.editedIndex = -1
+                // this.editedIndex = -1
             })
         },
 
@@ -318,9 +221,13 @@ export default {
 
         save () {
             if (this.editedIndex > -1) {
-                Object.assign(this.desserts[this.editedIndex], this.editedItem)
+                axios.put('/api/roles/'+this.editedItem.id, {'name': this.editedItem.name})
+                .then(res => Object.assign(this.roles[this.editedIndex], res.data.role))
+                .catch(err => console.dir(err.response))
             } else {
-                this.desserts.push(this.editedItem)
+              axios.post('/api/roles', {'name': this.editedItem.name})
+                  .then(res => this.roles.push(res.data.role))
+                  .catch(err => console.dir(err.response))
             }
             this.close()
         },

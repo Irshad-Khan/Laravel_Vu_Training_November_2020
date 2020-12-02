@@ -19,8 +19,7 @@
                                 <div>
                                     <v-form
                                         ref="form"
-                                        v-model="valid"
-                                    >
+                                        v-model="valid">
                                         <v-text-field
                                             label="Enter your e-mail address"
                                             v-model="email"
@@ -74,7 +73,7 @@ export default {
             ],
             password: '',
             passwordRules: [
-                v => !!v || 'E-mail is required',
+                v => !!v || 'Password is required',
             ],
             loading: false,
             snackbar: false,
